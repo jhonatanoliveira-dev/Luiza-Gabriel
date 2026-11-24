@@ -1202,12 +1202,13 @@ const noProductsMessage = document.getElementById('noProductsMessage');
 
 if (searchInput && noProductsMessage) {
   searchInput.addEventListener('input', () => {
-    const term = searchInput.value.trim().toLocaleLowerCase('pt-BR');
+    const normalizeSearch = value => value.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLocaleLowerCase('pt-BR');
+    const term = normalizeSearch(searchInput.value.trim());
     let visibleCount = 0;
 
     productCards.forEach(card => {
       const name = card.querySelector('h3')?.textContent || '';
-      const matches = name.toLocaleLowerCase('pt-BR').includes(term);
+      const matches = normalizeSearch(name).includes(term);
       card.hidden = !matches;
       if (matches) visibleCount++;
     });
