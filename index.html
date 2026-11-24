@@ -981,6 +981,11 @@ footer { background: #246F66; }
   background: linear-gradient(145deg, #EAF7F5, #FFFFFF);
 }
 
+.no-products { text-align: center; padding: 18px 12px; color: var(--green-dark); font-weight: 600; }
+@media (max-width: 600px) {
+  .header-inner > div:last-child { order: 4; width: 100%; }
+  .header-inner > div:last-child .search-box { display: flex; flex: 1; min-width: 0; }
+}
 </style>
 </head>
 <body>
@@ -1010,7 +1015,7 @@ footer { background: #246F66; }
 
     <div style="display:flex;align-items:center;gap:12px;">
       <div class="search-box">
-        <input type="text" placeholder="O que você procura?" aria-label="Buscar">
+        <input type="search" id="productSearch" placeholder="Buscar produto..." aria-label="Buscar produtos" autocomplete="off" aria-controls="productGrid">
       </div>
       <button class="cart-btn" id="cartBtn" aria-label="Sacola">
         🛒
@@ -1081,7 +1086,7 @@ footer { background: #246F66; }
     <p>Encontre seu próximo par favorito e aproveite a estação com personalidade</p>
   </div>
 
-  <div class="products-grid">
+  <div class="products-grid" id="productGrid">
     <article class="product">
       <div class="product-img"><div class="sandal"></div></div>
       <div class="product-info">
@@ -1148,6 +1153,7 @@ footer { background: #246F66; }
       </div>
     </article>
   </div>
+  <p id="noProductsMessage" class="no-products" role="status" aria-live="polite" hidden>Nenhum produto encontrado. Tente outro termo.</p>
 
   <div class="cta-banner">
     <div>
@@ -1190,6 +1196,25 @@ footer { background: #246F66; }
 const bag = [];
 const cartCount = document.getElementById('cartCount');
 const toast = document.getElementById('toast');
+const searchInput = document.getElementById('productSearch');
+const productCards = Array.from(document.querySelectorAll('.product'));
+const noProductsMessage = document.getElementById('noProductsMessage');
+
+if (searchInput && noProductsMessage) {
+  searchInput.addEventListener('input', () => {
+    const term = searchInput.value.trim().toLocaleLowerCase('pt-BR');
+    let visibleCount = 0;
+
+    productCards.forEach(card => {
+      const name = card.querySelector('h3')?.textContent || '';
+      const matches = name.toLocaleLowerCase('pt-BR').includes(term);
+      card.hidden = !matches;
+      if (matches) visibleCount++;
+    });
+
+    noProductsMessage.hidden = visibleCount > 0;
+  });
+}
 
 document.querySelectorAll('.btn-add').forEach(btn => {
   btn.addEventListener('click', () => {
